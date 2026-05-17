@@ -38,10 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    "todoapp",
+    'rest_framework',
+    'corsheaders',
+    'todoapp',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -50,6 +53,25 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'todoapp.auth.CookieJWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+SIMPLE_JWT = {
+    'AUTH_COOKIE': 'access_token',  # Cookie name
+    'AUTH_COOKIE_HTTP_ONLY': True,  # HttpOnly cookie
+    'AUTH_COOKIE_PATH': '/',        # Cookie path
+    'AUTH_COOKIE_SAMESITE': 'Lax',  # SameSite attribute
+}
+
+CORS_ALLOW_ALL_ORIGINS = True # For development, adjust for production
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'api.urls'
 
