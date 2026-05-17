@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,13 +21,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)y4_o+cqw8glu3c+yz0%*4oli+2_y)d#tf6!$jcs!&uiw0$l6e'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-)y4_o+cqw8glu3c+yz0%*4oli+2_y)d#tf6!$jcs!&uiw0$l6e')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+def get_env_list(var_name, default_val):
+    return [h.strip() for h in os.getenv(var_name, default_val).split(',') if h.strip()]
 
+ALLOWED_HOSTS = get_env_list('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1')
+
+# Proxy settings
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+FORCE_SCRIPT_NAME = os.getenv('FORCE_SCRIPT_NAME', None)
 
 # Application definition
 
@@ -70,7 +78,7 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_SAMESITE': 'Lax',  # SameSite attribute
 }
 
-CORS_ALLOW_ALL_ORIGINS = True # For development, adjust for production
+CORS_ALLOWED_ORIGINS = get_env_list('CORS_ALLOWED_ORIGINS', 'http://localhost:8080,http://127.0.0.1:8080')
 CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'api.urls'

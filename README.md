@@ -10,6 +10,19 @@ Toy multi-tenant to-do app using Django and Vue. Conventions:
 
 More specific design [docs](./docs/design.md).
 
+## Get started
+
+**TODO**: describe how to obtain certificates and set DJANGO_ALLOWED_HOSTS
+
+Start the stack in Docker Compose:
+
+```bash
+export DJANGO_ALLOWED_HOSTS=allowed.host
+docker compose up -d --build
+```
+
+The application will be available at `https://localhost` (via Nginx).
+
 ## Backend
 
 REST resources for todo-management. Start the server:
