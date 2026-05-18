@@ -24,6 +24,18 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             )
         return response
 
+class LogoutView(generics.GenericAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        response = Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
+        response.delete_cookie(
+            key=settings.SIMPLE_JWT['AUTH_COOKIE'],
+            path=settings.SIMPLE_JWT['AUTH_COOKIE_PATH'],
+            samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE'],
+        )
+        return response
+
 class TodoItemViewSet(viewsets.ModelViewSet):
     serializer_class = TodoItemSerializer
     permission_classes = (permissions.IsAuthenticated,)

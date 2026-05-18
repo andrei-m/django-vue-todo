@@ -24,6 +24,17 @@ class AuthTests(APITestCase):
         self.assertIn(settings.SIMPLE_JWT['AUTH_COOKIE'], response.cookies)
         self.assertTrue(response.cookies[settings.SIMPLE_JWT['AUTH_COOKIE']]['httponly'])
 
+    def test_logout_user_clears_cookie(self):
+        user = User.objects.create_user(username='testuser', password='testpassword123')
+        self.client.force_authenticate(user=user)
+        url = reverse('logout')
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # In Django's test client, deleting a cookie sets its value to "" and max-age to 0
+        cookie = response.cookies.get(settings.SIMPLE_JWT['AUTH_COOKIE'])
+        self.assertEqual(cookie.value, "")
+        self.assertEqual(cookie['max-age'], 0)
+
 class TodoItemTests(APITestCase):
     def setUp(self):
         self.user1 = User.objects.create_user(username='user1', password='password123')

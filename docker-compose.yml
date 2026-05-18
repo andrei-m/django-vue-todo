@@ -13,6 +13,13 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+      - ui
+
+  ui:
+    build: ./ui
+    networks:
+      - todo-net
+    restart: unless-stopped
 
   backend:
     build: ./backend
