@@ -17,5 +17,5 @@ COPY . /app/
 # Expose port
 EXPOSE 8000
 
-# Run migrations and start gunicorn
-CMD ["sh", "-c", "python manage.py migrate && gunicorn api.wsgi:application --bind 0.0.0.0:8000"]
+# Script to wait for DB and run migrations
+CMD ["sh", "-c", "python wait_for_db.py && python manage.py migrate && gunicorn api.wsgi:application --bind 0.0.0.0:8000"]
