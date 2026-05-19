@@ -10,22 +10,57 @@ Toy multi-tenant to-do app using Django and Vue. Conventions:
 
 More specific design [docs](./docs/design.md).
 
-## Get started
+## Setup & Getting Started
 
-**TODO**: describe how to obtain certificates and set DJANGO_ALLOWED_HOSTS
+### 1. Configure Hostname
 
-Start the stack in Docker Compose:
+To use a custom domain like `todo.local` for local development, add it to your system's hosts file:
+
+*   **Linux/macOS:** Edit `/etc/hosts` (requires `sudo`)
+*   **Windows:** Edit `C:\Windows\System32\drivers\etc\hosts` (requires Administrator)
+
+Add the following line:
+```text
+127.0.0.1   todo.local
+```
+
+Alternatively, for production, set up an `A` or `CNAME` record in your DNS provider pointing to your server's IP.
+
+### 2. Generate SSL Certificates
+
+The Nginx configuration requires three files in `./nginx/certs/`: `cert.pem`, `key.pem`, and `issuer.pem`.
+
+#### Option A: Self-Signed (Local Development)
+Use OpenSSL to generate a quick self-signed certificate:
+```bash
+mkdir -p nginx/certs
+openssl req -x509 -newkey rsa:4096 -keyout nginx/certs/key.pem -out nginx/certs/cert.pem -sha256 -days 365 -nodes -subj "/CN=todo.local"
+cp nginx/certs/cert.pem nginx/certs/issuer.pem
+```
+
+#### Option B: Let's Encrypt with `lego`
+If you have a public domain and want real certificates, use [lego](https://github.com/go-acme/lego):
+```bash
+# Example using HTTP challenge
+lego --email="your@email.com" --domains="yourdomain.com" --http run
+# Map the output to the expected filenames
+cp .lego/certificates/yourdomain.com.crt nginx/certs/cert.pem
+cp .lego/certificates/yourdomain.com.key nginx/certs/key.pem
+cp .lego/certificates/yourdomain.com.issuer.crt nginx/certs/issuer.pem
+```
+
+### 3. Start the Stack
 
 ```bash
-export DJANGO_ALLOWED_HOSTS=allowed.host
+export DJANGO_ALLOWED_HOSTS=todo.local
 docker compose up -d --build
 ```
 
-The application will be available at `https://localhost` (via Nginx).
+The application will be available at `https://todo.local` (via Nginx).
 
 ## Backend
 
-REST resources for todo-management. Start the server:
+REST resources for todo-management. For local development without Docker:
 
 ```bash
 # in ./backend
@@ -33,52 +68,45 @@ source .venv/bin/activate
 python manage.py runserver
 ```
 
-### API Examples
+### API Examples (using Docker/Nginx)
 
 **1. Sign Up**
 ```bash
-curl -X POST http://localhost:8000/api/register/ \
-     -H "Content-Type: application/json" \
+curl -X POST https://todo.local/backend/api/register/ \
+     -k -H "Content-Type: application/json" \
      -d '{"username": "newuser", "password": "securepassword123"}'
 ```
 
 **2. Login (Obtain JWT Cookie)**
 ```bash
-# This will return the access token and set an HTTP-only 'access_token' cookie.
-# The '-v' (verbose) flag allows you to see the response headers.
-curl -v -X POST http://localhost:8000/api/login/ \
-     -H "Content-Type: application/json" \
+curl -v -X POST https://todo.local/backend/api/login/ \
+     -k -H "Content-Type: application/json" \
      -d '{"username": "newuser", "password": "securepassword123"}'
-
-# Observe the cookie: Look for the 'set-cookie:' header in the output, e.g.:
-# < set-cookie: access_token=...; HttpOnly; Path=/; SameSite=Lax
 ```
 
 **3. Create a To-do**
 ```bash
-# Note: Since the backend uses cookies, you would normally send the cookie.
-# For testing with curl, you can also use the Bearer token from the login response.
-curl -X POST http://localhost:8000/api/todos/ \
-     -H "Content-Type: application/json" \
+curl -X POST https://todo.local/backend/api/todos/ \
+     -k -H "Content-Type: application/json" \
      -H "Authorization: Bearer <access_token>" \
      -d '{"title": "My first todo", "description": "Finish the backend implementation"}'
 ```
 
 **4. List To-dos**
 ```bash
-curl -H "Authorization: Bearer <access_token>" http://localhost:8000/api/todos/
+curl -k -H "Authorization: Bearer <access_token>" https://todo.local/backend/api/todos/
 ```
 
 **5. Update a To-do**
 ```bash
-curl -X PATCH http://localhost:8000/api/todos/<id>/ \
-     -H "Content-Type: application/json" \
+curl -X PATCH https://todo.local/backend/api/todos/<id>/ \
+     -k -H "Content-Type: application/json" \
      -H "Authorization: Bearer <access_token>" \
      -d '{"completed": true}'
 ```
 
 **6. Delete a To-do**
 ```bash
-curl -X DELETE http://localhost:8000/api/todos/<id>/ \
-     -H "Authorization: Bearer <access_token>"
+curl -X DELETE https://todo.local/backend/api/todos/<id>/ \
+     -k -H "Authorization: Bearer <access_token>"
 ```
