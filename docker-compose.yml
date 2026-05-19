@@ -12,8 +12,12 @@ services:
       - todo-net
     restart: unless-stopped
     depends_on:
-      - backend
-      - ui
+      backend:
+        condition: service_started
+        restart: true
+      ui:
+        condition: service_started
+        restart: true
 
   ui:
     build: ./ui
