@@ -43,11 +43,12 @@ class TodoItemTests(APITestCase):
 
     def test_create_todo(self):
         url = reverse('todo-list')
-        data = {'title': 'Test Todo', 'description': 'Test Description'}
+        data = {'title': 'Test Todo', 'description': 'Test Description', 'due_date': '2023-12-31T00:00:00Z'}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(TodoItem.objects.count(), 1)
         self.assertEqual(TodoItem.objects.get().user, self.user1)
+        self.assertEqual(TodoItem.objects.get().due_date.year, 2023)
 
     def test_user_isolation(self):
         # User 2 creates a todo

@@ -6,6 +6,7 @@ export interface Todo {
   title: string
   description: string
   completed: boolean
+  due_date: string | null
 }
 
 export function useTodos() {
