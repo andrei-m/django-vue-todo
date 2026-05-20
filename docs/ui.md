@@ -21,6 +21,13 @@ Initially, the goal of the app is to support user registration, login, and token
    * Registering successfully should navigate back to the login page (with a successful registration banner)
    * Logging in successfully should persist the JWT token cookie & refresh token.
 
+## Due Dates
+
+* To-do tasks should be organized by date date in reverse-chronological order.
+* Due dates should be presented as headings in `Jan 1st, YYYY` format. Tasks due on that date should be presented below the heading
+* Tasks without a date should be presented under a general `No Due Date` heading at the end of the list of headings.
+* Task create and edit should include an optional date picker Vuetify component that allows for setting a date.
+
 ## Design Questions
 
 ### 1. State Management
@@ -52,12 +59,24 @@ The backend uses Cookie-based JWT.
 
     A: Yes, redirect to register / login
 
-### 5. Project Structure
-Since we're using Vite:
-* Should the UI live in a new `frontend/` directory at the project root?
+### 6. Due Dates Implementation
 
-    A: The UI should live in a new `ui/` directory
+* **Date vs. DateTime:** The backend uses `DateTimeField`. Should we stick to just a **Date** (YYYY-MM-DD) for simplicity, or should users specify a **Time**?
 
-* Should I include a basic suite of Vitest/Vue Test Utils tests from the start?
+    A: Users should specify only a date. The backend can should set the 00:00:00 time to fit into the data model. Dates represent UTC days.
 
-    A: Yes
+* **Timezone Handling:** Should we handle dates in **UTC** (ISO strings) and localize in the browser, or use "naive" dates for this toy app?
+
+    A: UTC
+
+* **Grouping & Sorting:** The docs specify reverse-chronological order. Should future dates appear at the top? How should "Completed" tasks be handled relative to their date groups?
+
+    A: Future dates hould appear at the top. It's OK to include "Completed" tasks in their logical date groupings for now without any special handling.
+
+* **Date Picker UX:** Should the `v-date-picker` be **Inline** or triggered via a **Menu/Dialog** from a text field?
+
+    A: Inline - make it part of the TODO form.
+
+* **Utility Libraries:** Is it okay to add **`date-fns`** or **`dayjs`** for formatting (e.g., `Jan 1st, YYYY`) and sorting logic?
+
+    A: Yes, use your preferred choice.
