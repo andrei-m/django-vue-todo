@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/backend/api'
+
 const client = axios.create({
-  baseURL: '/backend/api',
+  baseURL: API_BASE_URL,
   withCredentials: true, // Required for cookies
 })
 
@@ -12,7 +14,7 @@ client.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
       try {
-        await axios.post('/backend/api/token/refresh/', {}, { withCredentials: true })
+        await axios.post(`${API_BASE_URL}/token/refresh/`, {}, { withCredentials: true })
         return client(originalRequest)
       } catch (refreshError) {
         // Refresh failed, probably need to redirect to login

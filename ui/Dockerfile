@@ -1,5 +1,10 @@
 FROM node:22-slim AS build
 WORKDIR /app
+
+# Add build argument for API base URL
+ARG VITE_API_BASE_URL=/backend/api
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+
 COPY package*.json ./
 RUN npm install
 COPY . .
