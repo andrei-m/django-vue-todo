@@ -20,7 +20,10 @@ services:
         restart: true
 
   ui:
-    build: ./ui
+    build:
+      context: ./ui
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-/backend/api}
     networks:
       - todo-net
     restart: unless-stopped
