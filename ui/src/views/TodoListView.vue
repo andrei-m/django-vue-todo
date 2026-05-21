@@ -64,7 +64,7 @@
     </v-row>
 
     <!-- Add/Edit Dialog -->
-    <v-dialog v-model="dialog" max-width="600px">
+    <v-dialog v-model="dialog" max-width="800px">
       <v-card>
         <v-card-title>
           <span class="text-h5">{{ editedId ? 'Edit Task' : 'New Task' }}</span>
@@ -91,11 +91,11 @@
                   color="primary"
                   width="100%"
                 ></v-date-picker>
-                <v-btn 
-                  v-if="editedItem.due_date" 
-                  variant="text" 
-                  size="small" 
-                  color="grey" 
+                <v-btn
+                  v-if="editedItem.due_date"
+                  variant="text"
+                  size="small"
+                  color="grey"
                   @click="editedItem.due_date = null"
                 >
                   Clear Date
@@ -146,7 +146,7 @@ const editedItem = reactive<{
 
 const groupedTodos = computed(() => {
   const groups: { [key: string]: Todo[] } = {}
-  
+
   // Sort todos by due_date reverse-chronologically
   const sortedTodos = [...todos.value].sort((a, b) => {
     if (!a.due_date && !b.due_date) return 0
@@ -204,7 +204,7 @@ function closeDialog() {
 
 async function saveTodo() {
   saving.value = true
-  
+
   // Format date to ISO string (YYYY-MM-DD) for backend
   const payload = {
     ...editedItem,
