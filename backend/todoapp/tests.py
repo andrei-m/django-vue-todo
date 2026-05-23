@@ -74,3 +74,22 @@ class TodoItemTests(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(TodoItem.objects.count(), 0)
+
+    def test_filter_todos_by_completed(self):
+        TodoItem.objects.create(user=self.user1, title='Active Todo', completed=False)
+        TodoItem.objects.create(user=self.user1, title='Completed Todo', completed=True)
+
+        url = reverse('todo-list')
+
+        # Default/False: Show only active
+        response = self.client.get(url)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['title'], 'Active Todo')
+
+        response = self.client.get(url, {'completed': 'false'})
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['title'], 'Active Todo')
+
+        # True: Show everything
+        response = self.client.get(url, {'completed': 'true'})
+        self.assertEqual(len(response.data), 2)

@@ -41,7 +41,13 @@ class TodoItemViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        return TodoItem.objects.filter(user=self.request.user)
+        queryset = TodoItem.objects.filter(user=self.request.user)
+        completed = self.request.query_params.get('completed')
+        # If completed is 'false' (or not provided/default), show only active tasks.
+        # If completed is 'true', show everything.
+        if completed == 'false' or completed is None:
+            queryset = queryset.filter(completed=False)
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
