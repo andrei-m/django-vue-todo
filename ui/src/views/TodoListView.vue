@@ -17,6 +17,18 @@
     </v-row>
 
     <v-row>
+      <v-col cols="12" class="d-flex align-center pb-0">
+        <v-checkbox
+          v-model="showCompleted"
+          label="Show completed tasks"
+          hide-details
+          density="compact"
+          @change="handleFilterChange"
+        ></v-checkbox>
+      </v-col>
+    </v-row>
+
+    <v-row>
       <v-col cols="12">
         <v-progress-linear v-if="loading" indeterminate color="primary"></v-progress-linear>
         <div v-else-if="Object.keys(groupedTodos).length > 0">
@@ -131,6 +143,7 @@ const { todos, loading, error, fetchTodos, addTodo, updateTodo, deleteTodo } = u
 const { logout } = useAuth()
 const router = useRouter()
 
+const showCompleted = ref(false)
 const dialog = ref(false)
 const saving = ref(false)
 const editedId = ref<number | null>(null)
@@ -147,8 +160,14 @@ const editedItem = reactive<{
 const groupedTodos = computed(() => {
   const groups: { [key: string]: Todo[] } = {}
 
+  // Filter out completed tasks locally if showCompleted is false
+  // This ensures immediate reactivity when a task is toggled
+  const filteredTodos = showCompleted.value
+    ? todos.value
+    : todos.value.filter(t => !t.completed)
+
   // Sort todos by due_date reverse-chronologically
-  const sortedTodos = [...todos.value].sort((a, b) => {
+  const sortedTodos = [...filteredTodos].sort((a, b) => {
     if (!a.due_date && !b.due_date) return 0
     if (!a.due_date) return 1
     if (!b.due_date) return -1
@@ -180,8 +199,12 @@ function formatDateHeading(dateKey: string) {
 }
 
 onMounted(() => {
-  fetchTodos()
+  fetchTodos({ completed: showCompleted.value })
 })
+
+function handleFilterChange() {
+  fetchTodos({ completed: showCompleted.value })
+}
 
 function openDialog(todo?: Todo) {
   if (todo) {

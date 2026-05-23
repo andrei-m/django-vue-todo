@@ -14,11 +14,17 @@ export function useTodos() {
   const loading = ref(false)
   const error = ref('')
 
-  async function fetchTodos() {
+  async function fetchTodos(filters: { completed?: boolean } = {}) {
     loading.value = true
     error.value = ''
     try {
-      const response = await client.get('/todos/')
+      const params = new URLSearchParams()
+      if (filters.completed !== undefined) {
+        params.append('completed', String(filters.completed))
+      }
+      const queryString = params.toString()
+      const url = queryString ? `/todos/?${queryString}` : '/todos/'
+      const response = await client.get(url)
       todos.value = response.data
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Failed to fetch todos.'
