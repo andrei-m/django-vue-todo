@@ -75,12 +75,12 @@ Vue.js frontend using Vite and Vuetify. To run the development server and connec
 ```bash
 # in ./ui
 npm install
-VITE_API_BASE_URL=http://localhost:8000/api npm run dev
+npm run dev
 ```
 
-This will start the UI on `http://localhost:5173` and point it at the Django server running on port 8000. 
+By default, the development server points to `http://localhost:8000/api` (configured in `ui/.env.development`). 
 
-**Note on CORS:** When running locally, ensure the Django `CORS_ALLOWED_ORIGINS` include the UI's address (default is `http://localhost:5173`). In Docker, these are configured via environment variables in `docker-compose.yml`.
+**Note on CORS:** The backend is pre-configured to allow requests from `http://localhost:5173` during local development.
 
 ### API Examples (using Docker/Nginx)
 
