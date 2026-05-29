@@ -42,11 +42,14 @@ class TodoItemViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = TodoItem.objects.filter(user=self.request.user)
-        completed = self.request.query_params.get('completed')
-        # If completed is 'false' (or not provided/default), show only active tasks.
-        # If completed is 'true', show everything.
-        if completed == 'false' or completed is None:
-            queryset = queryset.filter(completed=False)
+        # Apply the completed filter only for the 'list' action.
+        # This ensures detail actions (retrieve, update, delete) can still access completed items.
+        if self.action == 'list':
+            completed = self.request.query_params.get('completed')
+            # If completed is 'false' (or not provided/default), show only active tasks.
+            # If completed is 'true', show everything.
+            if completed == 'false' or completed is None:
+                queryset = queryset.filter(completed=False)
         return queryset
 
     def perform_create(self, serializer):

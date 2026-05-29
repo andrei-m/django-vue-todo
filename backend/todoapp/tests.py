@@ -93,3 +93,14 @@ class TodoItemTests(APITestCase):
         # True: Show everything
         response = self.client.get(url, {'completed': 'true'})
         self.assertEqual(len(response.data), 2)
+
+    def test_patch_completed_todo(self):
+        todo = TodoItem.objects.create(user=self.user1, title='Completed Todo', completed=True)
+        url = reverse('todo-detail', args=[todo.id])
+        data = {'title': 'Updated Title'}
+        response = self.client.patch(url, data, format='json')
+        # This currently fails with 404
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        todo.refresh_from_db()
+        self.assertEqual(todo.title, 'Updated Title')
+
