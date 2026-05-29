@@ -127,7 +127,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive, computed } from 'vue'
+import { ref, onMounted, reactive, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTodos } from '../composables/useTodos'
 import type { Todo } from '../composables/useTodos'
@@ -143,7 +143,11 @@ const { todos, loading, error, fetchTodos, addTodo, updateTodo, deleteTodo } = u
 const { logout } = useAuth()
 const router = useRouter()
 
-const showCompleted = ref(false)
+const showCompleted = ref(localStorage.getItem('showCompleted') === 'true')
+
+watch(showCompleted, (val) => {
+  localStorage.setItem('showCompleted', String(val))
+})
 const dialog = ref(false)
 const saving = ref(false)
 const editedId = ref<number | null>(null)
